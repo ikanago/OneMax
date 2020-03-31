@@ -1,5 +1,6 @@
 use rand::seq::IteratorRandom;
 use std::fmt;
+use std::time::Instant;
 
 use crate::indivisual::Indivisual;
 
@@ -28,6 +29,7 @@ impl Simulator {
     pub fn run(&mut self, iteration_count: usize, is_verbose: bool) {
         Self::sort_by_fitness(&mut self.population);
         println!("{}", self);
+        let start_time = Instant::now();
         for _ in 0..iteration_count {
             self.proceed_generation();
             self.current_generation += 1;
@@ -35,8 +37,9 @@ impl Simulator {
                 println!("{}", self);
             }
         }
+        let duration = start_time.elapsed().as_millis();
         println!("---------------------Result---------------------------");
-        println!("Best fitness: {}, Duration: {}", self.population[0].fitness, 0);
+        println!("Best fitness: {}, Duration: {}ms", self.population[0].fitness, duration);
     }
 
     fn proceed_generation(&mut self) {
