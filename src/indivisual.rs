@@ -10,7 +10,8 @@ pub struct Indivisual {
 }
 
 impl Indivisual {
-    pub fn new<R: Rng>(gene_length: usize, rng: &mut R) -> Self {
+    pub fn new(gene_length: usize) -> Self {
+        let mut rng = rand::thread_rng();
         let gene: Gene = (0..gene_length).map(|_| rng.gen_range(0, 2)).collect();
         Self {
             gene,
@@ -30,7 +31,8 @@ impl Indivisual {
         }
     }
 
-    pub fn cross_over<R: Rng>(parent1: &mut Indivisual, parent2: &mut Indivisual, gene_length: usize, rng: &mut R) {
+    pub fn cross_over(parent1: &mut Indivisual, parent2: &mut Indivisual, gene_length: usize) {
+        let mut rng = rand::thread_rng();
         let split_point1 = rng.gen_range(1, gene_length - 1);
         let split_point2 = rng.gen_range(split_point1 + 1, gene_length);
 
@@ -41,7 +43,8 @@ impl Indivisual {
         parent2.evaluate();
     }
 
-    pub fn mutate<R: Rng>(&mut self, mutation_rate: f64, rng: &mut R) {
+    pub fn mutate(&mut self, mutation_rate: f64) {
+        let mut rng = rand::thread_rng();
         if rng.gen_range(0_f64, 1_f64) < mutation_rate {
             let indice = rng.gen_range(0, self.gene.len());
             self.gene[indice] ^= 1;
