@@ -1,3 +1,4 @@
+use rand::seq::IteratorRandom;
 use std::fmt;
 
 use crate::indivisual::Indivisual;
@@ -7,49 +8,63 @@ pub struct Simulator {
     gene_length: usize,
     current_generation: usize,
     mutate_rate: f64,
-    indivisuals: Vec<Indivisual>,
+    population: Vec<Indivisual>,
 }
 
 impl Simulator {
     pub fn new(num_indivisuals: usize, gene_length: usize, mutate_rate: f64) -> Self {
-        let mut indivisuals: Vec<Indivisual> = (0..num_indivisuals)
+        let mut population: Vec<Indivisual> = (0..num_indivisuals)
             .map(|_| Indivisual::new(gene_length).evaluate().build())
             .collect();
-        Self::sort_by_fitness(&mut indivisuals);
+        Self::sort_by_fitness(&mut population);
         Self {
             gene_length,
             current_generation: 1,
             mutate_rate,
-            indivisuals,
+            population,
         }
     }
 
-    pub fn run(&mut self, iteration_count: usize) {
-        Self::sort_by_fitness(&mut self.indivisuals);
+    pub fn run(&mut self, iteration_count: usize, is_verbose: bool) {
+        Self::sort_by_fitness(&mut self.population);
         println!("{}", self);
         for _ in 0..iteration_count {
             self.proceed_generation();
             self.current_generation += 1;
-            println!("{}", self);
+            if is_verbose {
+                println!("{}", self);
+            }
         }
+        println!("---------------------Result---------------------------");
+        println!("Best fitness: {}, Duration: {}", self.population[0].fitness, 0);
     }
 
     fn proceed_generation(&mut self) {
-        let mut offspring: Vec<Indivisual> = Vec::with_capacity(self.indivisuals.len());
-        for _ in 0..self.indivisuals.len() / 2 {
-            let (mut parent1, mut parent2) = self.select();
-            Indivisual::cross_over(&mut parent1, &mut parent2, self.gene_length);
-            parent1.mutate(self.mutate_rate);
-            parent2.mutate(self.mutate_rate);
-            offspring.push(parent1);
-            offspring.push(parent2);
+        let mut offspring: Vec<Indivisual> = Vec::with_capacity(self.population.len());
+        for _ in 0..self.gene_length / 2 {
+            let mut parent_x = self.select();
+            let mut parent_y = self.select();
+            Indivisual::cross_over(&mut parent_x, &mut parent_y, self.gene_length);
+            parent_x.mutate(self.mutate_rate);
+            parent_y.mutate(self.mutate_rate);
+            offspring.push(parent_x.clone());
+            offspring.push(parent_y.clone());
         }
-        self.indivisuals = offspring;
-        Self::sort_by_fitness(&mut self.indivisuals);
+        self.population = offspring;
+        Self::sort_by_fitness(&mut self.population);
     }
 
-    fn select(&mut self) -> (Indivisual, Indivisual) {
-        (self.indivisuals[0].clone(), self.indivisuals[1].clone())
+    fn select(&mut self) -> Indivisual {
+        let candidate_size: usize = 4;
+        let mut rng = rand::thread_rng();
+        let candidate: Vec<Indivisual> = (0..candidate_size)
+            .map(|_| self.population.iter().choose(&mut rng).unwrap().clone())
+            .collect();
+        candidate
+            .iter()
+            .fold(Default::default(), |maximum, indivisual| {
+                std::cmp::max(maximum, indivisual.clone())
+            })
     }
 
     fn sort_by_fitness(indivisuals: &mut Vec<Indivisual>) {
@@ -59,7 +74,7 @@ impl Simulator {
 
 impl fmt::Display for Simulator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write! {f, "--------------------Generation {}--------------------\ngene_length: {}\nmutate_rate: {}\nmost elite indivisuals: {:?}"
-        , self.current_generation, self.gene_length, self.mutate_rate, self.indivisuals[0]}
+        write! {f, "--------------------Generation {}--------------------\nBest fitness: {}"
+        , self.current_generation, self.population[0].fitness}
     }
 }

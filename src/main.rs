@@ -15,6 +15,7 @@ fn main() {
         (@arg gene_length: -l --("gene-length") +takes_value "Length of gene (10)")
         (@arg mutation_rate: -m --("mutation-rate") +takes_value "Probability that mutation occurs (0.3)")
         (@arg iterations: -i --iteration +takes_value "Number of generations (20)")
+        (@arg verbose: -v --verbose "Enable verbose output")
     )
     .get_matches();
 
@@ -22,7 +23,8 @@ fn main() {
     let gene_length = value_t!(matches, "gene_length", usize).unwrap_or(10);
     let mutation_rate = value_t!(matches, "mutation_rate", f64).unwrap_or(0.3);
     let iteration_count = value_t!(matches, "iterations", usize).unwrap_or(20);
+    let is_verbose = matches.is_present("verbose");
 
     let mut simulator = Simulator::new(num_indivisuals, gene_length, mutation_rate);
-    simulator.run(iteration_count);
+    simulator.run(iteration_count, is_verbose);
 }

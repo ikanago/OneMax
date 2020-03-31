@@ -4,7 +4,7 @@ use std::mem;
 
 type Gene = Vec<f64>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Indivisual {
     pub gene: Gene,
     pub fitness: f64,
@@ -14,7 +14,7 @@ impl Indivisual {
     pub fn new(gene_length: usize) -> Self {
         let mut rng = rand::thread_rng();
         let gene: Gene = (0..gene_length)
-            .map(|_| rng.gen_range(0f64, 1f64))
+            .map(|_| rng.gen())
             .collect();
         Self {
             gene,
