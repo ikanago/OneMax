@@ -2,7 +2,6 @@ use std::fmt;
 
 use crate::indivisual::Indivisual;
 
-
 #[derive(Clone, Debug)]
 pub struct Simulator {
     gene_length: usize,
@@ -16,7 +15,7 @@ impl Simulator {
         let mut indivisuals: Vec<Indivisual> = (0..num_indivisuals)
             .map(|_| Indivisual::new(gene_length).evaluate().build())
             .collect();
-        Self::sort_by_evaluation(&mut indivisuals);
+        Self::sort_by_fitness(&mut indivisuals);
         Self {
             gene_length,
             current_generation: 1,
@@ -26,14 +25,13 @@ impl Simulator {
     }
 
     pub fn run(&mut self, iteration_count: usize) {
-        Self::sort_by_evaluation(&mut self.indivisuals);
+        Self::sort_by_fitness(&mut self.indivisuals);
         println!("{}", self);
         for _ in 0..iteration_count {
             self.proceed_generation();
             self.current_generation += 1;
             println!("{}", self);
         }
-        println!("{:?}", self.indivisuals);
     }
 
     fn proceed_generation(&mut self) {
@@ -47,15 +45,15 @@ impl Simulator {
             offspring.push(parent2);
         }
         self.indivisuals = offspring;
-        Self::sort_by_evaluation(&mut self.indivisuals);
+        Self::sort_by_fitness(&mut self.indivisuals);
     }
 
     fn select(&mut self) -> (Indivisual, Indivisual) {
         (self.indivisuals[0].clone(), self.indivisuals[1].clone())
     }
 
-    fn sort_by_evaluation(indivisuals: &mut Vec<Indivisual>) {
-        indivisuals.sort_by(|x, y| (y.evaluation).cmp(&x.evaluation));
+    fn sort_by_fitness(indivisuals: &mut Vec<Indivisual>) {
+        indivisuals.sort_by(|x, y| x.cmp(&y));
     }
 }
 

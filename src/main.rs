@@ -11,10 +11,10 @@ fn main() {
         (version: crate_version!())
         (author: crate_authors!())
         (about: crate_description!())
-        (@arg num_indivisuals: -n --("num-indivisuals") "Number of indivisuals (20)")
-        (@arg gene_length: -l --("gene-length") "Length of gene (10)")
-        (@arg mutation_rate: -m --("mutation-rate") "Probability that mutation occurs (0.3)")
-        (@arg iterations: -i --iteration "Number of generations (20)")
+        (@arg num_indivisuals: -n --("num-indivisuals") +takes_value "Number of indivisuals (20)")
+        (@arg gene_length: -l --("gene-length") +takes_value "Length of gene (10)")
+        (@arg mutation_rate: -m --("mutation-rate") +takes_value "Probability that mutation occurs (0.3)")
+        (@arg iterations: -i --iteration +takes_value "Number of generations (20)")
     )
     .get_matches();
 
