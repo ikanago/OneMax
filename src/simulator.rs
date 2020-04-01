@@ -3,43 +3,50 @@ use std::fmt;
 use std::time::Instant;
 
 use crate::indivisual::Indivisual;
+use crate::Parameters;
 
 #[derive(Clone, Debug)]
 pub struct Simulator {
-    gene_length: usize,
-    current_generation: usize,
-    mutate_rate: f64,
     population: Vec<Indivisual>,
+    current_generation: usize,
+    gene_length: usize,
+    iteration_count: usize,
+    mutation_rate: f64,
+    is_verbose: bool,
 }
 
 impl Simulator {
-    pub fn new(num_indivisuals: usize, gene_length: usize, mutate_rate: f64) -> Self {
-        let mut population: Vec<Indivisual> = (0..num_indivisuals)
-            .map(|_| Indivisual::new(gene_length).evaluate().build())
+    pub fn new(params: &Parameters) -> Self {
+        let mut population: Vec<Indivisual> = (0..params.population_size)
+            .map(|_| Indivisual::new(params.gene_length).evaluate().build())
             .collect();
         Self::sort_by_fitness(&mut population);
         Self {
-            gene_length,
-            current_generation: 1,
-            mutate_rate,
             population,
+            current_generation: 1,
+            gene_length: params.gene_length,
+            iteration_count: params.iteration_count,
+            mutation_rate: params.mutation_rate,
+            is_verbose: params.is_verbose,
         }
     }
 
-    pub fn run(&mut self, iteration_count: usize, is_verbose: bool) {
+    pub fn run(&mut self) {
         Self::sort_by_fitness(&mut self.population);
-        println!("{}", self);
         let start_time = Instant::now();
-        for _ in 0..iteration_count {
-            self.proceed_generation();
-            self.current_generation += 1;
-            if is_verbose {
+        for _ in 0..self.iteration_count {
+            if self.is_verbose {
                 println!("{}", self);
             }
+            self.proceed_generation();
+            self.current_generation += 1;
         }
         let duration = start_time.elapsed().as_millis();
-        println!("---------------------Result---------------------------");
-        println!("Best fitness: {}, Duration: {}ms", self.population[0].fitness, duration);
+        println!("---------------------Result--------------------------");
+        println!(
+            "Best fitness: {}, Duration: {}ms\n",
+            self.population[0].fitness, duration
+        );
     }
 
     fn proceed_generation(&mut self) {
@@ -48,8 +55,8 @@ impl Simulator {
             let mut parent_x = self.select();
             let mut parent_y = self.select();
             Indivisual::cross_over(&mut parent_x, &mut parent_y, self.gene_length);
-            parent_x.mutate(self.mutate_rate);
-            parent_y.mutate(self.mutate_rate);
+            parent_x.mutate(self.mutation_rate);
+            parent_y.mutate(self.mutation_rate);
             offspring.push(parent_x.clone());
             offspring.push(parent_y.clone());
         }
