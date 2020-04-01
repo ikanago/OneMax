@@ -2,6 +2,7 @@ use rand::Rng;
 use std::cmp::{Eq, Ordering, PartialEq, PartialOrd};
 use std::mem;
 
+
 type Gene = Vec<f64>;
 
 #[derive(Clone, Debug, Default)]
@@ -13,9 +14,7 @@ pub struct Indivisual {
 impl Indivisual {
     pub fn new(gene_length: usize) -> Self {
         let mut rng = rand::thread_rng();
-        let gene: Gene = (0..gene_length)
-            .map(|_| rng.gen())
-            .collect();
+        let gene: Gene = (0..gene_length).map(|_| rng.gen()).collect();
         Self {
             gene,
             fitness: 0f64,

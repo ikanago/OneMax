@@ -3,16 +3,16 @@ use std::fmt;
 use std::time::Instant;
 
 use crate::indivisual::Indivisual;
-use crate::Parameters;
+use crate::{Parameters, SimulationResult};
+
 
 #[derive(Clone, Debug)]
 pub struct Simulator {
     population: Vec<Indivisual>,
     current_generation: usize,
     gene_length: usize,
-    iteration_count: usize,
     mutation_rate: f64,
-    is_verbose: bool,
+    iteration_count: usize,
 }
 
 impl Simulator {
@@ -25,28 +25,26 @@ impl Simulator {
             population,
             current_generation: 1,
             gene_length: params.gene_length,
-            iteration_count: params.iteration_count,
             mutation_rate: params.mutation_rate,
-            is_verbose: params.is_verbose,
+            iteration_count: params.iteration_count,
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> SimulationResult {
         Self::sort_by_fitness(&mut self.population);
         let start_time = Instant::now();
         for _ in 0..self.iteration_count {
-            if self.is_verbose {
-                println!("{}", self);
-            }
             self.proceed_generation();
             self.current_generation += 1;
         }
         let duration = start_time.elapsed().as_millis();
-        println!("---------------------Result--------------------------");
-        println!(
-            "Best fitness: {}, Duration: {}ms\n",
-            self.population[0].fitness, duration
-        );
+        SimulationResult {
+            fitness: self.population[0].fitness,
+            duration,
+            mutation_rate: self.mutation_rate,
+            iteration_count: self.iteration_count,
+            population_size: self.population.len(),
+        }
     }
 
     fn proceed_generation(&mut self) {
