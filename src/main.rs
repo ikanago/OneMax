@@ -26,9 +26,9 @@ fn main() {
         (@arg iterations: -i --iteration +takes_value "Number of generations (20)")
         (@arg verbose: -v --verbose "Enable verbose output")
         (@group analyze =>
-            (@arg analyze_mutation: --am ... +takes_value "Specify a range of mutation rate(0, 1, 0.1)")
+            (@arg analyze_mutation: --am ... #{0,3} +takes_value "Specify a range of mutation rate(0, 1, 0.1)")
             (@arg analyze_iteration: --ai ... #{0,3} +takes_value "Specify a range of iteration(10, 100, 10)")
-            (@arg analyze_population: --ap ... +takes_value "Specify a range of population size(10, 100, 10)")
+            (@arg analyze_population: --ap ... #{0,3} +takes_value "Specify a range of population size(10, 100, 10)")
         )
     )
     .get_matches();
